@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up - Wage Calculator Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Translate -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,ja,my,th,zh-CN,ko',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer></script>
+</head>
+<body class="fullscreen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+  <div class="flex min-h-screen">
+    <!-- Left panel (form) -->
+    <div class="flex-1 flex items-center justify-center p-6">
+      <div class="w-full max-w-md bg-white dark:bg-slate-800 shadow-xl rounded-2xl p-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Create Account</h2>
+          <div id="google_translate_element"></div>
+        </div>
+        {% if error %}
+          <p class="mb-4 text-red-600 text-sm">{{ error }}</p>
+        {% endif %}
+        <form method="post" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Username</label>
+            <input type="text" name="username" required
+              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:text-white" placeholder="Choose a username">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
+            <input type="email" name="email"
+              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:text-white" placeholder="your@email.com">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Password</label>
+            <input type="password" name="password" required
+              class="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:text-white" placeholder="Create a password">
+          </div>
+          <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
+            Sign Up
+          </button>
+        </form>
+        <p class="text-center text-sm text-gray-600 dark:text-gray-300 mt-6">
+          Already have an account?
+          <a href="{{ url_for('login') }}" class="text-blue-600 hover:underline">Log In</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Right panel (image) -->
+    <div class="hidden lg:flex flex-col justify-between w-1/2 p-10 bg-[url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center">
+      <div class="text-white">
+        <h1 class="text-4xl font-extrabold drop-shadow">Welcome to Wage Calculator Pro</h1>
+        <p class="mt-2 text-lg drop-shadow">Fast. Accurate. Multilingual.</p>
+      </div>
+      <div class="text-white">
+        <p class="opacity-80">© {{ 2025 }} Wage Calculator Pro</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

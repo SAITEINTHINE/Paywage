@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wage Calculator Pro</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- Google Translate -->
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,ja,my,th,zh-CN,ko',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer></script>
+</head>
+
+<body class="min-h-screen transition-colors duration-300">
+  <div id="app" class="w-screen min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-white shadow-lg">
+      <div class="px-4 md:px-8 lg:px-12 py-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <h1 class="text-3xl font-bold text-blue-600">💰 Wage Calculator Pro</h1>
+          <div class="relative flex items-center gap-2">
+            <button id="translateBtn"
+                    class="px-3 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors text-sm flex items-center gap-1"
+                    title="Translate">🌐 <span class="hidden sm:inline">Translate</span></button>
+            <button id="themeToggle"
+                    class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">🌙 Dark</button>
+            <a href="{{ url_for('logout') }}"
+               class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">Logout</a>
+
+            <!-- Translate popover -->
+            <div id="gtPopover" class="hidden absolute right-0 top-[110%] z-50 gt-pop shadow-xl">
+              <div id="google_translate_element"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="mt-4 grid grid-cols-2 sm:flex sm:space-x-4 gap-2">
+          <button class="nav-btn active px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" data-page="main">📊 Calculator</button>
+          <button class="nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" data-page="history">📋 History</button>
+          <button class="nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" data-page="settings">⚙️ Settings</button>
+          <button class="nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" data-page="advanced">🔧 Advanced</button>
+          <button class="nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" data-page="profile">👤 Profile</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="w-full px-4 md:px-8 lg:px-12 py-6 space-y-6">
+
+      <!-- Calculator Page -->
+      <section id="mainPage" class="page">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">📝 Shift Details</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                <input type="date" id="workDate"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                  <input type="time" id="startTime"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                  <input type="time" id="endTime"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Break Start</label>
+                  <input type="time" id="breakStart"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Break End</label>
+                  <input type="time" id="breakEnd"
+                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Shift Type</label>
+                <select id="shiftType"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="part-time">Part-time</option>
+                  <option value="full-time">Full-time</option>
+                  <option value="day">Day Shift</option>
+                  <option value="night">Night Shift</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Hourly Wage</label>
+                <div class="flex">
+                  <select id="currency"
+                          class="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="¥">¥</option>
+                    <option value="$">$</option>
+                    <option value="€">€</option>
+                  </select>
+                  <input type="number" id="hourlyWage" placeholder="1200"
+                         class="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+              </div>
+              <button id="calculateBtn"
+                      class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-lg">
+                🧮 Calculate Wage
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">💵 Results</h2>
+            <div id="results" class="space-y-4">
+              <div class="text-center text-gray-500 py-8">
+                Enter shift details and click calculate to see results
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- History Page -->
+      <section id="historyPage" class="page hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">📋 Shift History</h2>
+            <div class="flex flex-wrap gap-2">
+              <button id="exportPDF"
+                      class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">📄 Export PDF</button>
+              <button id="exportCSV"
+                      class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">📊 Export CSV</button>
+              <button id="exportExcel"
+                      class="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors">📊 Export to Excel</button>
+              <button id="clearHistory"
+                      class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">🗑️ Clear All</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h3 class="font-semibold text-blue-800">This Week</h3>
+              <p id="weeklyTotal" class="text-2xl font-bold text-blue-600">¥0</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg">
+              <h3 class="font-semibold text-green-800">This Month</h3>
+              <p id="monthlyTotal" class="text-2xl font-bold text-green-600">¥0</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <h3 class="font-semibold text-purple-800">Total Records</h3>
+              <p id="totalRecords" class="text-2xl font-bold text-purple-600">0</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Shift Type</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Start</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">End</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Break</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Total Time</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Hourly Wage</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Total Wage</th>
+                  <th class="border border-gray-300 px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="9" class="border border-gray-300 px-4 py-8 text-center text-gray-500">
+                    No shift records yet. Start by calculating your first shift!
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Page -->
+      <section id="settingsPage" class="page hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold mb-6 text-gray-800">⚙️ Basic Settings</h2>
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Default Hourly Wage</label>
+              <div class="flex">
+                <select id="defaultCurrency" class="px-3 py-2 border border-gray-300 rounded-l-lg">
+                  <option value="¥">¥</option>
+                  <option value="$">$</option>
+                  <option value="€">€</option>
+                </select>
+                <input type="number" id="defaultWage" placeholder="1200"
+                       class="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Default Shift Type</label>
+              <select id="defaultShiftType" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <option value="part-time">Part-time</option>
+                <option value="full-time">Full-time</option>
+                <option value="day">Day Shift</option>
+                <option value="night">Night Shift</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Auto-save Calculations</label>
+              <label class="flex items-center">
+                <input type="checkbox" id="autoSave" class="mr-2" checked>
+                <span>Automatically save each calculation to history</span>
+              </label>
+            </div>
+            <button id="saveSettings"
+                    class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">💾 Save Settings</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Advanced Page -->
+      <section id="advancedPage" class="page hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">🌙 Night Shift Settings</h3>
+            <div class="space-y-4">
+              <label class="flex items-center">
+                <input type="checkbox" id="enableNightShift" class="mr-2">
+                <span>Enable Night Shift Bonus (25%)</span>
+              </label>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Night Start</label>
+                  <input type="time" id="nightStart" value="22:00" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Night End</label>
+                  <input type="time" id="nightEnd" value="05:00" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">⏰ Overtime Settings</h3>
+            <div class="space-y-4">
+              <label class="flex items-center">
+                <input type="checkbox" id="enableOvertime" class="mr-2">
+                <span>Enable Overtime Calculation</span>
+              </label>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Overtime After (hours)</label>
+                <input type="number" id="overtimeThreshold" value="8"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Overtime Rate (%)</label>
+                <input type="number" id="overtimeRate" value="150"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">💰 Bonuses & Deductions</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Meal Allowance</label>
+                <input type="number" id="mealAllowance" placeholder="500"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Transport Allowance</label>
+                <input type="number" id="transportAllowance" placeholder="300"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Weekend Bonus (%)</label>
+                <input type="number" id="weekendBonus" placeholder="10"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">🔔 Notifications</h3>
+            <div class="space-y-4">
+              <label class="flex items-center"><input type="checkbox" id="enableNotifications" class="mr-2"><span>Enable Notifications</span></label>
+              <label class="flex items-center"><input type="checkbox" id="shiftReminders" class="mr-2"><span>Shift Reminders</span></label>
+              <label class="flex items-center"><input type="checkbox" id="paydayAlerts" class="mr-2"><span>Payday Alerts</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 text-center">
+          <button id="saveAdvanced"
+                  class="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transition-colors font-semibold">💾 Save Advanced Settings</button>
+        </div>
+      </section>
+
+      <!-- Profile Page (centered) -->
+      <section id="profilePage" class="page hidden flex justify-center">
+        <div class="bg-white rounded-lg shadow p-6 w-full max-w-lg">
+          <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">👤 Profile</h2>
+          <div class="flex flex-col items-center space-y-3 mb-6">
+            <label class="cursor-pointer">
+              <input type="file" id="profilePicInput" accept="image/*" class="hidden">
+              <img id="profilePic" src="https://ui-avatars.com/api/?name=Guest" alt="Profile"
+                   class="w-24 h-24 rounded-full border-2 border-blue-400 object-cover hover:opacity-80 transition">
+            </label>
+            <span class="text-xs text-gray-500">Click image to upload</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <input type="text" id="profileUsernameInput"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" value="Guest">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input type="email" id="profileEmailInput"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" value="-">
+            </div>
+            <button id="saveProfileBtn"
+                    class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 font-semibold mt-2 transition">
+              💾 Save Profile
+            </button>
+          </div>
+          <div class="flex space-x-4 mt-6 justify-center">
+            <button id="profileExportPDF"
+                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">📄 Export PDF</button>
+            <button id="profileExportCSV"
+                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">📊 Export CSV</button>
+          </div>
+          <div class="mt-6 text-center">
+            <button id="logoutBtn"
+                    class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">🚪 Log Out</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

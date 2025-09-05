@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile - {{ user.username }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-100">
+  <div class="max-w-5xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold">Welcome, {{ user.username }}</h2>
+      <a href="{{ url_for('logout') }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Logout</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 overflow-x-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Your Shift Records</h3>
+        <a href="{{ url_for('export_csv') }}" class="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600">Export CSV</a>
+      </div>
+      <table class="min-w-full border border-gray-300">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="border px-3 py-2 text-left">Date</th>
+            <th class="border px-3 py-2 text-left">Type</th>
+            <th class="border px-3 py-2 text-left">Start</th>
+            <th class="border px-3 py-2 text-left">End</th>
+            <th class="border px-3 py-2 text-left">Break Start</th>
+            <th class="border px-3 py-2 text-left">Break End</th>
+            <th class="border px-3 py-2 text-left">Hours</th>
+            <th class="border px-3 py-2 text-left">Hourly Wage</th>
+            <th class="border px-3 py-2 text-left">Currency</th>
+            <th class="border px-3 py-2 text-left">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for shift in user.shifts %}
+          <tr class="hover:bg-gray-50">
+            <td class="border px-3 py-2">{{ shift.date }}</td>
+            <td class="border px-3 py-2">{{ shift.shift_type }}</td>
+            <td class="border px-3 py-2">{{ shift.start_time }}</td>
+            <td class="border px-3 py-2">{{ shift.end_time }}</td>
+            <td class="border px-3 py-2">{{ shift.break_start }}</td>
+            <td class="border px-3 py-2">{{ shift.break_end }}</td>
+            <td class="border px-3 py-2">{{ shift.total_hours }}</td>
+            <td class="border px-3 py-2">{{ shift.hourly_wage }}</td>
+            <td class="border px-3 py-2">{{ shift.currency }}</td>
+            <td class="border px-3 py-2">{{ shift.total_wage }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

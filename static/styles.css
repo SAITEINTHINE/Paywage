@@ -1,0 +1,79 @@
+/* Full width and no horizontal scroll */
+html, body { width: 100%; overflow-x: hidden; }
+
+/* Light / Dark variables */
+:root {
+  --bg: #f3f4f6;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #4b5563;
+  --border: #e5e7eb;
+}
+.dark {
+  --bg: #0b1220;
+  --card: #0f172a;
+  --text: #e5e7eb;
+  --muted: #a1a1aa;
+  --border: #263246;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Cards/text in dark */
+.dark .bg-white { background-color: var(--card) !important; }
+.dark .text-gray-800 { color: var(--text) !important; }
+.dark .text-gray-700 { color: var(--muted) !important; }
+.dark .bg-gray-50 { background-color: #111827 !important; }
+.dark .border-gray-300 { border-color: var(--border) !important; }
+
+/* Form controls dark */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="time"],
+.dark input[type="date"],
+.dark select,
+.dark textarea {
+  background: #0f172a !important;
+  color: var(--text) !important;
+  border-color: #334155 !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #94a3b8; }
+
+/* Nav btn dark */
+.dark .nav-btn { background-color: #111827 !important; color: #e5e7eb !important; }
+.dark .nav-btn.active { background-color: #3b82f6 !important; color: #fff !important; }
+
+/* Google Translate popover */
+.gt-pop {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  padding: .5rem .75rem;
+}
+.gt-pop .goog-te-gadget img { display: none; }
+.gt-pop .goog-te-gadget { font-size: 0; }
+.gt-pop .goog-te-combo {
+  font-size: 14px !important;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: .375rem;
+  background: inherit;
+  color: inherit;
+}
+
+/* Hide Google banner */
+.goog-te-banner-frame { display: none !important; }
+body { top: 0 !important; }
+
+/* Animation */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.slide-in { animation: slideIn 0.3s ease-out; }
